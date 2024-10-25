@@ -1,0 +1,100 @@
+---
+title:  "IDS 2021. Problem Set 2"
+author: "Muhammad Zahidul Islam Miaji"
+date:   "Last updated at `r Sys.time()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-data, message = FALSE}
+#install.packages("gapminder")
+library(gapminder)
+library(tidyverse)
+
+gapminder07 <- filter(gapminder, year %in% 2007)
+```
+
+## Q1 
+
+How many variables and how many observations are in the original gapminder data? How about for the data subset for 2007?
+
+```{r}
+glimpse(gapminder)
+observ_gapminder <- gapminder
+observ_gapminder
+gapminder
+gapminder07 <- filter(gapminder, year %in% 2007)
+```
+
+Total observation for "gapminder" is 1704 of 6 variables. And year of 2007 (subset 2007) is 142 observation of 6 variables
+
+
+## Q2 
+
+Let's create a new variable `real_gdp` by multiplying the `gdpPercap` variable with the `pop` variable (hint: 1. GDP per capita is calculated by dividing the real GDP by population, 2. use the `mutate` function to create the new variable)
+
+```{r}
+gapminder_realGdp <- gapminder %>%
+  mutate(real_gdp = gdpPercap * pop)
+gapminder_realGdp
+
+```
+
+## Q3 
+
+Next, let's compute the average life expectancy by continent in the year 2007. (hint: 1. so you'll need to use the `gapminder07` data. 2. you wilcontinl probably need to use functions such as `filter`, `group_by`, `summarize`, and `mean`, 3. make sure to use `na.rm=TRUE` for your mean function to avoid observations from dropping out of your data inadvertantly).
+
+```{r}
+avg_life <- gapminder07 %>%
+  filter(!is.na(lifeExp), !is.na(continent)) %>%
+  group_by(lifeExp, continent) %>%
+  summarise(avg_LE = round(mean(lifeExp, na.rm = TRUE)))
+avg_life            
+```
+
+
+
+## Q4 
+
+Next, let's compute the average life expectancy by continent and year from the full dataset (`gapminder`). Draw a line plot over time to examine the trend.
+
+```{r}
+gapminder %>%
+    group_by(continent, year) %>%
+    summarise(lifeExp=mean(lifeExp)) %>%
+    ggplot(aes(x=year, y=lifeExp, color=continent)) +
+     geom_line(size=1) + 
+     geom_point(size=1.5)
+    
+
+```
+
+## Q5 
+
+```{r}
+gapminder%>%
+  filter (year %in% c(1957, 1977, 1997))%>%
+  ggplot(aes(x = log(gdpPercap), color= as.factor(year), fill= as.factor(year))) +
+  geom_density(alpha= 0.2)
+  
+```
+
+
+## Q6. 
+
+Create a table that shows the Life Expectancy in 2007 for the countries in the Americas. Report only the country and the life expectancy variables in the table. (hint: you will probably need to use functions such as `filter`, `select`, `tableGrob`, `grid.arrange`, or `kable`).
+
+```{r}
+library(gridExtra)
+```
+```{r, fig.height=8, fig.width=4}
+gapminder %>%
+  filter(year== 2007, continent== "Americas")%>%
+  select(country, lifeExp)%>%
+  tableGrob(cols = c("country", "lifeExp")) %>%
+  grid.arrange()
+
+```
