@@ -1,0 +1,146 @@
+---
+title:  "IDS 2020. Problem Set 1"
+author: "Muhammad Zahidul Islam Miaji"
+date:   "Last updated at `r Sys.time()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-data, message = FALSE}
+#install.packages("gapminder")
+library(gapminder)
+library(tidyverse)
+
+gapminder07 <- filter(gapminder, year %in% 2007)
+```
+
+Note: in any graphs, try to provide meaningful labels whenever possible.
+
+## Question 1
+
+What is this data set about? (hint: Try ?gapminder to learn more about the data set) What are we doing when we write `gapminder07 <- filter(gapminder, year %in% 2007)`?
+
+?gapminder
+it's a data set on life expectancy, GDP per capita, and population by country
+
+```{r}
+gapminder07 <- filter(gapminder, year %in% 2007)
+gapminder07
+```
+it means we are specify the data set by the year of 2007. now it will show the all countries data on lifeExp, pop and gdpPercap of year 2007.
+
+
+
+## Question 2
+
+How many different countries are in the data? (hint: try glimpse, head, str, summary, or any other commands to get some sense about the data)
+
+```{r}
+glimpse(gapminder)
+str(gapminder)
+```
+Total 142 different countries exist in the data level
+
+## Question 3
+
+What is the distribution of the life expectancy at birth in 2007? (Note: here on out, we will be using the `gapminder07` data for the rest of the exercise. Hint: Try drawing a histogram)
+
+
+```{r}
+histo007 <- ggplot(data = gapminder07) +
+  geom_histogram(aes(x = lifeExp),
+                 color = "white") +
+  scale_x_continuous("Life Expectancy at Bith in 2007") +
+  theme_bw()
+histo007
+```
+
+## Question 4
+
+Now try depicting the same information using a density plot. This time, try also to color the distribution by continent (hint: use aesthetic `fill` to specify the coloring for the continents.)
+
+```{r}
+ggplot(data = gapminder07) +
+  geom_density(aes(x = lifeExp, color = continent, fill = continent))+
+  scale_color_brewer("Continent", palette = "Accent") +
+    scale_fill_brewer("Continent", palette = "Accent") +
+  scale_x_continuous("Life Expectancy by continent") +
+  theme_bw()
+
+```
+
+## Question 5
+
+What is the relationship between GDP per capita and life expectancy? (Hint: try to draw out a scatter plot using points)
+
+```{r}
+ggplot(data = gapminder07) +
+  geom_point(aes(x = gdpPercap, y = lifeExp)) +
+  xlab("GDP Per Capita") + ylab("life Expectancy")
+```
+
+
+## Question 6
+
+Next, try to plot the same information, this time with the points colored by continents and varying in their size by population (hint: try using `color` and `size` in the `aes`)
+
+```{r}
+ggplot(data = gapminder07) +
+  geom_point(aes(x = gdpPercap, y = lifeExp, color = continent), size = 2, shape= 17) +
+  xlab("GDP Per Capita") + ylab("life Expectancy")
+```
+
+
+## Question 7
+
+This time, use `gapminder` instead of `gapminder07` as your dataset. Using a line graph, plot the overtime change in the life expectency across different countries and color them by continents. (hint: draw a line graph. put the year on the x-axis and the life expectancy on the y-axis. Also specify `group = country` and `color=continent` in the `aes`.)
+
+```{r}
+gapminder
+ggplot(data = gapminder)+
+  geom_line(aes(x= year, y= lifeExp, group= country, color= continent), lwd=1)+
+  xlab("year")+ ylab("Life Expectancy")+
+  theme_bw()
+
+```
+  
+  
+
+## Question 8
+
+Finally, try executing the following code, and write in words what your take away is from the information provided in the resulting graph. (hint: you need to remove the `eval=FALSE` from the code chunk bracket below.)
+
+```{r}
+ggplot(gapminder07) +
+  # add scatter points
+  geom_point(aes(x = gdpPercap, y = lifeExp, color = continent, size = pop),
+             alpha = 0.5) +
+  # add some text annotations for the very large countries
+  geom_text(aes(x = gdpPercap, y = lifeExp + 3, label = country),
+            color = "grey50",
+            data = filter(gapminder07, pop > 1000000000 | country %in% c("Nigeria", "United States"))) +
+  # clean the axes names and breaks
+  scale_x_log10(limits = c(200, 60000)) +
+  # change labels
+  labs(title = "GDP versus life expectancy in 2007",
+       x = "GDP per capita (log scale)",
+       y = "Life expectancy",
+       size = "Popoulation",
+       color = "Continent") +
+  # change the size scale
+  scale_size(range = c(0.1, 10),
+             # remove size legend
+             guide = "none") +
+  # add a nicer theme
+  theme_classic() +
+  # place legend at top and grey axis lines
+  theme(legend.position = "top",
+        axis.line = element_line(color = "grey85"),
+        axis.ticks = element_line(color = "grey85"))
+```
+This code used for creating scatterplot. it is usually shows us relationship between two continuous variables. In the code we try to discover "gapminder07" data, GDP per capital in the x-axis and life expectancy in the y-axis. we labeled continents in various color and marked bubble size with population size. we try to see the USA and Nigeria population and which countries population > 1000000000.
+
+In the graph, we are seeing that USA has higher GDP per capita and higher life expectancy than designated criteria (Nigeria and population > 1000000000). we also get china and india are the largest population size (Bubble size). Finally we can conclude that, USA is the far ahead than china and India but Nigeria has very low life expectancy rate. 
